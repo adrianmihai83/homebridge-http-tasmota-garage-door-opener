@@ -1,6 +1,6 @@
 # Homebridge Tasmota Garage Door Opener
 
-This is a [homebridge](https://github.com/nfarina/homebridge) plugin to connect with a Sonoff Relay Board with Tasmota firmware into a Garage Door Opener via the Home app on iOS using Homekit.
+This is a [homebridge](https://github.com/nfarina/homebridge) plugin to connect with a Sonoff Relay Board with Tasmota firmware and open/close garage doors using HTTP requests via the Home app on iOS using Homekit.
 
 ![](sonoff-garage-opener.gif)
 
