@@ -21,16 +21,25 @@
     "sonoff-4ch"
   ],
   "scripts": {
-    "lint": "eslint ."
+    "lint": "eslint src/**/*.ts --max-warnings=0",
+    "HB-stop": "sudo hb-service stop",
+    "HB-start": "sudo hb-service start",
+    "watch": "sudo npm link && nodemon",
+    "link": "sudo npm link",
+    "unlink": "sudo npm unlink homebridge-http-tasmota-garage-door-opener",
+    "build": "rimraf ./dist && tsc",
+    "prepublishOnly": "npm run lint && npm run build"
   },
   "author": "Adrian MIHAI",
   "license": "ISC",
   "dependencies": {
-    "request": "^2.83.0"
+    "request": "^2.83.0",
+    "rimraf": "^5.0.7"
   },
   "devDependencies": {
-    "eslint": "^4.13.1",
-    "eslint-plugin-node": "^5.2.1",
-    "eslint-plugin-standard": "^3.0.1"
+    "eslint": "^9.3.0",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-standard": "^3.0.1",
+    "nodemon": "^3.1.1"
   }
 }

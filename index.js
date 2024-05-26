@@ -20,6 +20,7 @@ class GarageDoorOpener {
     this.closureTime = config.closureTime || this.openingTime;
     this.doorRelayPin = config.doorRelayPin;
     this.timeBeforeClosure = config.timeBeforeClosure || 0;
+    this.autoCloseByCommand = config.autoCloseByCommand || false;
 
     this.currentDoorState = CurrentDoorState.CLOSED;
     this.targetDoorState = TargetDoorState.CLOSED;
@@ -127,14 +128,23 @@ class GarageDoorOpener {
             this.service.setCharacteristic(CurrentDoorState, CurrentDoorState.CLOSED);
           }, stateChangeTimer);
         } else if (this.currentDoorState === CurrentDoorState.OPEN) {
-          if (this.timeBeforeClosure != 0) {
-            this.log.debug("AUTOCLOSING in " + this.timeBeforeClosure / 1000 + " SECONDS");
-            this.timerBeforeClosure = setTimeout(() => {
-              this.targetDoorState = TargetDoorState.CLOSED;
-              this.openCloseGarage(() => this.service.setCharacteristic(TargetDoorState, TargetDoorState.CLOSED));
-            }, this.timeBeforeClosure);
+          if (this.autoCloseByCommand) {
+            if (this.timeBeforeClosure != 0) {
+              this.log("AUTOCLOSING by command in " + this.timeBeforeClosure / 1000 + " SECONDS");
+              this.timerBeforeClosure = setTimeout(() => {
+                this.targetDoorState = TargetDoorState.CLOSED;
+                this.openCloseGarage(() => this.service.setCharacteristic(TargetDoorState, TargetDoorState.CLOSED));
+              }, this.timeBeforeClosure);
+            } else {
+              this.service.setCharacteristic(TargetDoorState, TargetDoorState.CLOSED);
+            }
           } else {
-            this.service.setCharacteristic(TargetDoorState, TargetDoorState.CLOSED);
+            this.log("SIMULATING autoclose in " + this.timeBeforeClosure / 1000 + " SECONDS");
+            this.timerBeforeClosure = setTimeout(() => {
+              this.service.setCharacteristic(CurrentDoorState, CurrentDoorState.CLOSED);
+              this.currentDoorState = CurrentDoorState.CLOSED;
+              this.targetDoorState = TargetDoorState.CLOSED;
+            }, this.timeBeforeClosure);
           }
         }
         callback();

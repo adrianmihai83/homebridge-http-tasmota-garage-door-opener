@@ -18,10 +18,10 @@
       "openCloseTime": 15000,
       "openingTime": 15000,
       "closureTime": 15000,
-      "timeBeforeClosure": 30000
+      "timeBeforeClosure": 30000,
+      "autoCloseByCommand": false
     }
   ],
 
-  "platforms": [
-  ]
+  "platforms": []
 }
