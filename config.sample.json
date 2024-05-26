@@ -1,0 +1,27 @@
+{
+  "bridge": {
+    "name": "Homebridge",
+    "username": "CC:22:3D:E3:CE:50",
+    "port": 51826,
+    "pin": "031-45-154"
+  },
+
+  "description": "",
+
+  "accessories": [
+    {
+      "accessory": "HTTP Tasmota Garage Door Opener",
+      "name": "Garage Door",
+      "ip": "192.168.0.85",
+      "password": "",
+      "doorRelayPin": 1,
+      "openCloseTime": 15000,
+      "openingTime": 15000,
+      "closureTime": 15000,
+      "timeBeforeClosure": 30000
+    }
+  ],
+
+  "platforms": [
+  ]
+}

@@ -1,0 +1,36 @@
+{
+  "name": "homebridge-http-tasmota-garage-door-opener",
+  "version": "1.0.0",
+  "description": "Homebridge plugin for Sonoff (one or multiple chanels) running tasmota to open garage doors and gates with the Garage UI on the HomeKit App using HTTP request",
+  "main": "index.js",
+  "engines": {
+    "node": ">=6.12.2",
+    "homebridge": ">=0.4.33"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/adrianmihai83/homebridge-http-tasmota-garage-door-opener.git"
+  },
+  "keywords": [
+    "homebridge-plugin",
+    "garage-door-opener",
+    "homebridge",
+    "tasmota-door-opener",
+    "sonoff",
+    "sonoff-sv",
+    "sonoff-4ch"
+  ],
+  "scripts": {
+    "lint": "eslint ."
+  },
+  "author": "Adrian MIHAI",
+  "license": "ISC",
+  "dependencies": {
+    "request": "^2.83.0"
+  },
+  "devDependencies": {
+    "eslint": "^4.13.1",
+    "eslint-plugin-node": "^5.2.1",
+    "eslint-plugin-standard": "^3.0.1"
+  }
+}
