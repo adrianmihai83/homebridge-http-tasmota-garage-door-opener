@@ -1,4 +1,4 @@
-# Homebridge Tasmota Garage Door Opener
+# Homebridge HTTP Tasmota Garage Door Opener
 
 This is a [homebridge](https://github.com/nfarina/homebridge) plugin to connect with a Sonoff Relay Board with Tasmota firmware and open/close garage doors using HTTP requests via the Home app on iOS using Homekit.
 
@@ -45,12 +45,15 @@ Just add the following config to your homebridge config file located at this (de
 }
 ```
 
-openCloseTime - set if open and close time is identical
-openingTime and closureTime - optional - if they are different (time that the gate takes to open and close)
-timeBeforeClosure - used for autoclosing using same command after requiered timeBeforeClosure time, if autoCloseByCommand is set TRUE, it will send a close command after the specified time
-autoCloseByCommand - false (false -> will NOT send a close command, in conjunction with timeBeforeClosure can be used to simulate the gate closing by itself after interval set by timeBeforeClosure)
+- openCloseTime - set if open and close time is identical without openingTime or closureTime
+- openingTime and closureTime - optional - if they are different (time that the gate takes to open and close)
+- timeBeforeClosure - used for autoclosing using same command after requiered timeBeforeClosure time, if - autoCloseByCommand is set TRUE, it will send a close command after the specified time
+- autoCloseByCommand - false (false -> will NOT send a close command, in conjunction with timeBeforeClosure can be used to simulate the gate closing by itself after interval set by timeBeforeClosure)
 
-Also a openCloseTime = 0 can be set for these doors/gates that have just a lock to open. The advantage of using this instead of a common switch is that Apple requires all security Homekit devices to ask for passcode / TouchID / FaceID before triggering this kind of devices.
+Also a openCloseTime = 0 can be set for these doors/gates that have just a lock to open.
+
+The advantage of using this instead of a common switch is that Apple requires all security Homekit devices to ask for passcode / TouchID / FaceID before triggering this kind of devices.
+
 No more wrong taps on the door unlock!
 
 CREDITS for original plugin that I used as a template goes to @ankurp. Thank you man!
