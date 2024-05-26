@@ -1,4 +1,4 @@
-var request = require('request');
+var request = require("request");
 
 let Service, Characteristic, TargetDoorState, CurrentDoorState;
 
@@ -7,10 +7,10 @@ module.exports = function (homebridge) {
   Characteristic = homebridge.hap.Characteristic;
   TargetDoorState = Characteristic.TargetDoorState;
   CurrentDoorState = Characteristic.CurrentDoorState;
-  homebridge.registerAccessory('homebridge-http-tasmota-garage-door-opener', 'HTTP Tasmota Garage Door Opener', HTTPGarageDoorOpener);
+  homebridge.registerAccessory("homebridge-http-tasmota-garage-door-opener", "HTTP Tasmota Garage Door Opener", GarageDoorOpener);
 };
 
-class HTTPGarageDoorOpener {
+class GarageDoorOpener {
   constructor(log, config) {
     this.log = log;
     this.name = config.name;
@@ -26,56 +26,56 @@ class HTTPGarageDoorOpener {
   }
 
   identify(callback) {
-    this.log('Identify requested!');
+    this.log("Identify requested!");
     callback(null);
   }
 
   openCloseGarage(callback) {
+    request.get(
+      {
+        url: "http://" + this.ip + "/cm?user=admin&password=" + this.password + "&cmnd=Power" + this.doorRelayPin + " On",
+        timeout: 120000
+      },
+      (error, response, body) => {
+        this.log.debug("openCloseGarage", response.statusCode, body);
+        if (!error && response.statusCode == 200) {
+          //this.log.debug('Response: %s', body);
+          callback();
+        }
 
-    request.get({
-      url: 'http://' + this.ip + '/cm?user=admin&password=' + this.password + '&cmnd=Power' + this.doorRelayPin + ' On',
-      timeout: 120000
-    }, (error, response, body) => {
-      this.log.debug('openCloseGarage', response.statusCode, body);
-      if (!error && response.statusCode == 200) {
-        //this.log.debug('Response: %s', body);
-        callback();
+        //this.log.debug('Error setting door state. (%s)', error);
       }
-
-      //this.log.debug('Error setting door state. (%s)', error);
-    });
-
+    );
   }
 
   getServices() {
     const informationService = new Service.AccessoryInformation();
 
     informationService
-      .setCharacteristic(Characteristic.Manufacturer, 'Iot-HUB')
-      .setCharacteristic(Characteristic.Model, 'HTTP Tasmota Garage Door Opener')
-      .setCharacteristic(Characteristic.SerialNumber, '0xl33t');
+      .setCharacteristic(Characteristic.Manufacturer, "Iot-HUB")
+      .setCharacteristic(Characteristic.Model, "HTTP Tasmota Garage Door Opener")
+      .setCharacteristic(Characteristic.SerialNumber, "0xl33t");
 
-    this.service = new Service.HTTPGarageDoorOpener(this.name, this.name);
+    this.service = new Service.GarageDoorOpener(this.name, this.name);
     this.service.setCharacteristic(TargetDoorState, TargetDoorState.CLOSED);
     this.service.setCharacteristic(CurrentDoorState, CurrentDoorState.CLOSED);
 
-    this.service.getCharacteristic(TargetDoorState)
-      .on('get', (callback) => {
+    this.service
+      .getCharacteristic(TargetDoorState)
+      .on("get", (callback) => {
         callback(null, this.targetDoorState);
       })
-      .on('set', (value, callback) => {
+      .on("set", (value, callback) => {
         this.targetDoorState = value;
         clearTimeout(this.timerBeforeClosure);
         if (this.targetDoorState === TargetDoorState.OPEN) {
           // want to open
           if (this.currentDoorState === CurrentDoorState.CLOSED) {
-            this.openCloseGarage(() =>
-              this.service.setCharacteristic(CurrentDoorState, CurrentDoorState.OPENING));
+            this.openCloseGarage(() => this.service.setCharacteristic(CurrentDoorState, CurrentDoorState.OPENING));
           } else if (this.currentDoorState === CurrentDoorState.OPENING) {
             // Do nothing
           } else if (this.currentDoorState === CurrentDoorState.CLOSING) {
-            this.openCloseGarage(() =>
-              this.service.setCharacteristic(CurrentDoorState, CurrentDoorState.OPENING));
+            this.openCloseGarage(() => this.service.setCharacteristic(CurrentDoorState, CurrentDoorState.OPENING));
           } else if (this.currentDoorState === CurrentDoorState.OPEN) {
             // Do nothing
           }
@@ -83,27 +83,25 @@ class HTTPGarageDoorOpener {
           if (this.currentDoorState === CurrentDoorState.CLOSED) {
             // Do nothing
           } else if (this.currentDoorState === CurrentDoorState.OPENING) {
-            this.openCloseGarage(() =>
-              this.openCloseGarage(() =>
-                this.service.setCharacteristic(CurrentDoorState, CurrentDoorState.CLOSING)));
+            this.openCloseGarage(() => this.openCloseGarage(() => this.service.setCharacteristic(CurrentDoorState, CurrentDoorState.CLOSING)));
             // Do nothing
           } else if (this.currentDoorState === CurrentDoorState.CLOSING) {
             // Do nothing
           } else if (this.currentDoorState === CurrentDoorState.OPEN) {
-            this.openCloseGarage(() =>
-              this.service.setCharacteristic(CurrentDoorState, CurrentDoorState.CLOSING));
+            this.openCloseGarage(() => this.service.setCharacteristic(CurrentDoorState, CurrentDoorState.CLOSING));
           }
         }
         callback();
       });
 
-    this.service.getCharacteristic(CurrentDoorState)
-      .on('get', (callback) => {
+    this.service
+      .getCharacteristic(CurrentDoorState)
+      .on("get", (callback) => {
         callback(null, this.currentDoorState);
       })
-      .on('set', (value, callback) => {
+      .on("set", (value, callback) => {
         this.currentDoorState = value;
-        this.log('current status: ', this.doorStateToString(this.currentDoorState));
+        this.log("current status: ", this.doorStateToString(this.currentDoorState));
         if (this.currentDoorState === CurrentDoorState.OPENING) {
           clearTimeout(this.openCloseTimer);
           this.doorOpenStartTime = new Date();
@@ -130,11 +128,10 @@ class HTTPGarageDoorOpener {
           }, stateChangeTimer);
         } else if (this.currentDoorState === CurrentDoorState.OPEN) {
           if (this.timeBeforeClosure != 0) {
-            this.log.debug('AUTOCLOSING in ' + this.timeBeforeClosure / 1000 + ' SECONDS');
+            this.log.debug("AUTOCLOSING in " + this.timeBeforeClosure / 1000 + " SECONDS");
             this.timerBeforeClosure = setTimeout(() => {
               this.targetDoorState = TargetDoorState.CLOSED;
-              this.openCloseGarage(() =>
-                this.service.setCharacteristic(TargetDoorState, TargetDoorState.CLOSED));
+              this.openCloseGarage(() => this.service.setCharacteristic(TargetDoorState, TargetDoorState.CLOSED));
             }, this.timeBeforeClosure);
           } else {
             this.service.setCharacteristic(TargetDoorState, TargetDoorState.CLOSED);
@@ -143,11 +140,9 @@ class HTTPGarageDoorOpener {
         callback();
       });
 
-    this.service
-      .getCharacteristic(Characteristic.Name)
-      .on('get', callback => {
-        callback(null, this.name);
-      });
+    this.service.getCharacteristic(Characteristic.Name).on("get", (callback) => {
+      callback(null, this.name);
+    });
 
     return [informationService, this.service];
   }
@@ -155,18 +150,17 @@ class HTTPGarageDoorOpener {
   doorStateToString(state) {
     switch (state) {
       case CurrentDoorState.OPEN:
-        return 'OPEN';
+        return "OPEN";
       case CurrentDoorState.CLOSED:
-        return 'CLOSED';
+        return "CLOSED";
       case CurrentDoorState.STOPPED:
-        return 'STOPPED';
+        return "STOPPED";
       case CurrentDoorState.OPENING:
-        return 'OPENING';
+        return "OPENING";
       case CurrentDoorState.CLOSING:
-        return 'CLOSING';
+        return "CLOSING";
       default:
-        return 'UNKNOWN';
+        return "UNKNOWN";
     }
   }
-
 }
